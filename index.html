@@ -6,6 +6,8 @@
   <title>SkyResume — AI Resume Builder</title>
   <meta name="theme-color" content="#6857e8" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -20,7 +22,7 @@
       <div class="sidebar-bottom">
         <div class="upgrade-card"><div class="sparkle">✦</div><strong>Unlock your edge</strong><p>Get unlimited AI suggestions and premium templates.</p><button class="upgrade-btn">Upgrade plan <span>→</span></button></div>
         <button class="nav-item muted"><span>⚙</span> Settings</button>
-        <div class="profile"><div class="avatar">JD</div><div><strong>Jordan Davis</strong><small>Free plan</small></div><span class="dots">•••</span></div>
+        <button class="profile profile-button" id="authButton"><div class="avatar">JD</div><div><strong id="profileName">Jordan Davis</strong><small id="profilePlan">Free plan · Local mode</small></div><span class="dots">•••</span></button>
       </div>
     </aside>
 
@@ -80,6 +82,7 @@
     </main>
   </div>
   <div class="toast" id="toast"></div>
+  <div class="modal-backdrop hidden" id="authModal"><div class="preview-modal auth-modal"><button class="close-modal" id="closeAuth">×</button><div class="eyebrow">SKYRESUME ACCOUNT</div><h2 id="authTitle">Save your resume in the cloud</h2><p class="modal-subtitle">Create an account to sync resumes across devices. You can continue locally without signing in.</p><form id="authForm"><label>Email address<input id="authEmail" type="email" required placeholder="you@example.com" /></label><label>Password<input id="authPassword" type="password" required minlength="6" placeholder="At least 6 characters" /></label><button class="primary-btn auth-submit" type="submit" id="authSubmit">Create account</button></form><button class="text-btn auth-toggle" id="authToggle" type="button">Already have an account? Sign in</button><button class="outline-btn guest-btn" id="continueGuest" type="button">Continue in local mode</button><p class="auth-status" id="authStatus"></p></div></div>
   <div class="modal-backdrop hidden" id="tailorModal"><div class="preview-modal tailor-modal"><button class="close-modal" id="closeTailor">×</button><div class="eyebrow">JOB TAILOR</div><h2>Match your resume to a role</h2><p class="modal-subtitle">Paste a job description and ElevateCV will surface missing keywords and rewrite opportunities.</p><label class="full-label">Job description<textarea id="jobDescription" rows="8" placeholder="Paste the job description here...">We are looking for a Product Designer to lead user research, Figma prototyping, design systems, A/B testing, and cross-functional collaboration with engineering.</textarea></label><button class="primary-btn tailor-analyze" id="analyzeJob">Analyze job match ✦</button><div class="tailor-results hidden" id="tailorResults"><div class="match-result"><span class="match-score-big">76%</span><div><strong>Good match with room to improve</strong><p>Add the highlighted skills to increase your relevance.</p></div></div><div class="keyword-list" id="keywordList"></div><button class="outline-btn" id="applyKeywords">Add missing keywords to skills <span>→</span></button></div></div></div>
   <div class="modal-backdrop hidden" id="previewModal"><div class="preview-modal"><button class="close-modal" id="closeModal">×</button><div class="resume-preview"><div class="resume-preview-header"><h1 id="previewName">Jordan Davis</h1><p id="previewTitle">Product Designer</p><small id="previewContact">jordan.davis@email.com  ·  +1 (415) 555-0198  ·  San Francisco, CA</small></div><h4>SUMMARY</h4><p id="previewSummary"></p><h4>EXPERIENCE</h4><p><strong>Senior Product Designer · Northstar Labs</strong><br>Led end-to-end design for the core analytics platform, increasing weekly active users by 38%.</p><h4>SKILLS</h4><p id="previewSkills"></p></div></div></div>
   <script src="app.js"></script>
