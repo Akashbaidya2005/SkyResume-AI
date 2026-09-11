@@ -51,6 +51,8 @@ $('#summaryAi').addEventListener('click', () => { $('#summary').value = 'Product
 $('#rescanBtn').addEventListener('click', () => { updateScore(); toast('ATS scan refreshed — your resume is looking strong'); });
 $('#scanBtn').addEventListener('click', () => { updateScore(3); toast('Scan complete — 3 keyword opportunities found'); });
 $('#saveBtn').addEventListener('click', () => toast('All changes saved just now'));
+$('#upgradeCta').addEventListener('click', () => toast('Pro plan preview: unlimited scans, tailoring, and premium designs'));
+$('.upgrade-btn').addEventListener('click', () => toast('Pro plan preview: unlimited scans, tailoring, and premium designs'));
 $('#addExperience').addEventListener('click', () => { const card = document.createElement('article'); card.className = 'experience-card collapsed'; card.innerHTML = '<div class="card-top"><div><strong>New position</strong><span>Company name · Location</span></div><button class="more-btn">•••</button></div><div class="experience-meta">Add dates</div><div class="card-actions"><button class="edit-experience">✎ Edit</button><button class="delete-experience">♲ Remove</button></div>'; $('#experienceList').append(card); bindExperienceActions(card); toast('New experience added'); });
 function bindExperienceActions(root = document) { $$('.delete-experience', root).forEach(btn => btn.addEventListener('click', () => { btn.closest('.experience-card').remove(); toast('Experience removed'); })); $$('.edit-experience', root).forEach(btn => btn.addEventListener('click', () => toast('Experience editor is ready to customize'))); }
 bindExperienceActions();
