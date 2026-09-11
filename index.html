@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyResume — AI Resume Builder</title>
+  <meta name="theme-color" content="#6857e8" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand" aria-label="SkyResume home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" role="img"><path class="logo-cloud" d="M8.2 22.4h15.1a5.1 5.1 0 0 0 .4-10.2A8.5 8.5 0 0 0 7.6 14a4.2 4.2 0 0 0 .6 8.4Z"/><path class="logo-paper" d="M11.3 17.2h9.4M11.3 20.5h6.5"/></svg></span><span>Sky<span class="brand-accent">Resume</span></span></div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="builder"><span>▦</span> Builder</button>
+        <button class="nav-item" data-view="templates"><span>▤</span> Templates</button>
+        <button class="nav-item" data-view="ats"><span>◒</span> ATS Scanner</button>
+        <button class="nav-item" data-view="tailor"><span>✎</span> Job Tailor</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="upgrade-card"><div class="sparkle">✦</div><strong>Unlock your edge</strong><p>Get unlimited AI suggestions and premium templates.</p><button class="upgrade-btn">Upgrade plan <span>→</span></button></div>
+        <button class="nav-item muted"><span>⚙</span> Settings</button>
+        <div class="profile"><div class="avatar">JD</div><div><strong>Jordan Davis</strong><small>Free plan</small></div><span class="dots">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="mobile-brand" aria-label="SkyResume">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" role="img"><path class="logo-cloud" d="M8.2 22.4h15.1a5.1 5.1 0 0 0 .4-10.2A8.5 8.5 0 0 0 7.6 14a4.2 4.2 0 0 0 .6 8.4Z"/><path class="logo-paper" d="M11.3 17.2h9.4M11.3 20.5h6.5"/></svg></span>
+          <strong>Sky<span>Resume</span></strong>
+        </div>
+        <div class="breadcrumb"><span>My resumes</span><b>/</b><strong>Product Designer Resume</strong></div>
+        <div class="top-actions"><button class="icon-btn" aria-label="Notifications">♢</button><button class="help-link">Help center</button><button class="preview-btn" id="previewBtn">Preview resume <span>↗</span></button></div>
+      </header>
+
+      <section class="page-heading">
+        <div><p class="eyebrow">RESUME WORKSPACE</p><h1>Build a resume that gets noticed.</h1><p class="subtitle">Crafted for humans. Optimized for ATS. Powered by AI.</p></div>
+        <div class="heading-actions"><button class="secondary-btn" id="saveBtn">↗ Save changes</button><button class="primary-btn" id="downloadBtn">↓ Download PDF</button></div>
+      </section>
+
+      <div class="workspace-grid">
+        <section class="editor-panel">
+          <div class="tabs"><button class="tab active" data-tab="content">Content</button><button class="tab" data-tab="design">Design</button><button class="tab" data-tab="settings">Settings</button></div>
+          <div class="tab-content" id="contentTab">
+            <div class="section-header"><div><h2>Personal details</h2><p>Make it easy for recruiters to reach you.</p></div><span class="complete-badge">✓ Complete</span></div>
+            <div class="form-grid">
+              <label>Full name<input id="fullName" value="Jordan Davis" /></label>
+              <label>Professional title<input id="jobTitle" value="Product Designer" /></label>
+              <label>Email address<input id="email" value="jordan.davis@email.com" type="email" /></label>
+              <label>Phone number<input id="phone" value="+1 (415) 555-0198" /></label>
+              <label>Location<input id="location" value="San Francisco, CA" /></label>
+              <label>Portfolio / LinkedIn<input id="website" value="jordan-davis.design" /></label>
+            </div>
+            <div class="section-header section-spaced"><div><h2>Professional summary</h2><p>Show your value in 3–4 concise sentences.</p></div><button class="ai-btn" id="summaryAi">✦ Improve with AI</button></div>
+            <label class="full-label"><textarea id="summary" rows="5">Product designer with 6+ years of experience creating intuitive, accessible digital products used by millions. I turn complex problems into simple, delightful experiences through research, rapid prototyping, and close collaboration with engineering.</textarea><span class="char-count" id="summaryCount">206 / 500</span></label>
+            <div class="section-header section-spaced"><div><h2>Work experience</h2><p>Highlight impact, not just responsibilities.</p></div><button class="text-btn" id="addExperience">＋ Add experience</button></div>
+            <div id="experienceList">
+              <article class="experience-card"><div class="card-top"><div><strong>Senior Product Designer</strong><span>Northstar Labs · San Francisco, CA</span></div><button class="more-btn">•••</button></div><div class="experience-meta">2021 — Present <span class="tag">Current role</span></div><p>Led end-to-end design for the core analytics platform, increasing weekly active users by 38%.</p><div class="card-actions"><button class="edit-experience">✎ Edit</button><button class="delete-experience">♲ Remove</button></div></article>
+              <article class="experience-card collapsed"><div class="card-top"><div><strong>Product Designer</strong><span>Orbit Commerce · Austin, TX</span></div><button class="more-btn">•••</button></div><div class="experience-meta">2018 — 2021</div><div class="card-actions"><button class="edit-experience">✎ Edit</button><button class="delete-experience">♲ Remove</button></div></article>
+            </div>
+            <div class="section-header section-spaced"><div><h2>Skills</h2><p>Add keywords that match your target roles.</p></div><button class="text-btn" id="addSkill">＋ Add skill</button></div>
+            <div class="skill-input"><div id="skillChips"><span class="skill-chip">Product strategy <button>×</button></span><span class="skill-chip">User research <button>×</button></span><span class="skill-chip">Figma <button>×</button></span><span class="skill-chip">Prototyping <button>×</button></span><span class="skill-chip">Design systems <button>×</button></span></div><input id="skillField" placeholder="Type a skill and press Enter..." /></div>
+          </div>
+          <div class="tab-content hidden" id="designTab"><div class="section-header"><div><h2>Design your resume</h2><p>Make every detail feel like you.</p></div><span class="complete-badge">Live preview</span></div><div class="design-section"><h3>Accent color</h3><div class="color-swatches" id="colorSwatches"></div></div><div class="design-options"><label>Font pairing<select id="fontSelect"><option value="modern">Modern sans</option><option value="classic">Classic serif</option><option value="editorial">Editorial</option><option value="humanist">Humanist</option><option value="mono">Tech mono</option><option value="rounded">Friendly rounded</option></select></label><label>Layout density<select id="densitySelect"><option value="comfortable">Comfortable</option><option value="compact">Compact</option><option value="spacious">Spacious</option></select></label></div><div class="design-section"><div class="design-section-heading"><h3>Choose a layout</h3><span>10 styles</span></div><div class="template-grid small" id="templateGrid"></div></div></div>
+          <div class="tab-content hidden" id="settingsTab"><div class="section-header"><div><h2>Resume settings</h2><p>Control visibility and sharing preferences.</p></div></div><div class="setting-row"><div><strong>Show contact icons</strong><p>Display icons next to your email, phone and links.</p></div><label class="switch"><input type="checkbox" checked><span></span></label></div><div class="setting-row"><div><strong>Public portfolio link</strong><p>Make your resume shareable with a private link.</p></div><label class="switch"><input type="checkbox" checked><span></span></label></div></div>
+        </section>
+
+        <aside class="insights-panel">
+          <div class="score-card"><div class="score-heading"><div><p class="eyebrow">ATS READINESS</p><h2>Your score</h2></div><button class="refresh-score" id="rescanBtn">↻</button></div><div class="score-ring"><div><strong id="scoreValue">82</strong><span>/ 100</span></div></div><div class="score-status"><span class="status-dot"></span><strong>Great foundation!</strong><span>2 improvements to reach 90+</span></div><div class="progress-line"><span style="width:82%"></span></div><div class="score-breakdown"><div><span>Keywords</span><strong>88%</strong></div><div><span>Formatting</span><strong>94%</strong></div><div><span>Impact</span><strong>76%</strong></div></div><button class="full-width-btn" id="scanBtn">Scan resume with AI <span>✦</span></button></div>
+          <div class="insight-card"><div class="insight-title"><span class="title-icon purple">✦</span><div><h3>AI suggestions</h3><p>Quick wins for a stronger resume</p></div><span class="count-badge">2</span></div><div class="suggestion"><div><strong>Add measurable impact</strong><p>2 bullets could be more specific with numbers.</p></div><button class="suggestion-action" data-suggestion="impact">Fix <span>→</span></button></div><div class="suggestion"><div><strong>Match more keywords</strong><p>Add “A/B testing” to improve relevance.</p></div><button class="suggestion-action" data-suggestion="keyword">Fix <span>→</span></button></div><button class="view-all">View all suggestions <span>→</span></button></div>
+          <div class="insight-card job-card"><div class="insight-title"><span class="title-icon orange">⌁</span><div><h3>Target job</h3><p>See how you match the role</p></div></div><div class="job-preview"><div class="company-logo">N</div><div><strong>Product Designer</strong><span>Nova · Remote</span></div><span class="match-score">76%</span></div><button class="outline-btn" id="tailorBtn">Tailor resume to this job <span>→</span></button></div>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="modal-backdrop hidden" id="tailorModal"><div class="preview-modal tailor-modal"><button class="close-modal" id="closeTailor">×</button><div class="eyebrow">JOB TAILOR</div><h2>Match your resume to a role</h2><p class="modal-subtitle">Paste a job description and ElevateCV will surface missing keywords and rewrite opportunities.</p><label class="full-label">Job description<textarea id="jobDescription" rows="8" placeholder="Paste the job description here...">We are looking for a Product Designer to lead user research, Figma prototyping, design systems, A/B testing, and cross-functional collaboration with engineering.</textarea></label><button class="primary-btn tailor-analyze" id="analyzeJob">Analyze job match ✦</button><div class="tailor-results hidden" id="tailorResults"><div class="match-result"><span class="match-score-big">76%</span><div><strong>Good match with room to improve</strong><p>Add the highlighted skills to increase your relevance.</p></div></div><div class="keyword-list" id="keywordList"></div><button class="outline-btn" id="applyKeywords">Add missing keywords to skills <span>→</span></button></div></div></div>
+  <div class="modal-backdrop hidden" id="previewModal"><div class="preview-modal"><button class="close-modal" id="closeModal">×</button><div class="resume-preview"><div class="resume-preview-header"><h1 id="previewName">Jordan Davis</h1><p id="previewTitle">Product Designer</p><small id="previewContact">jordan.davis@email.com  ·  +1 (415) 555-0198  ·  San Francisco, CA</small></div><h4>SUMMARY</h4><p id="previewSummary"></p><h4>EXPERIENCE</h4><p><strong>Senior Product Designer · Northstar Labs</strong><br>Led end-to-end design for the core analytics platform, increasing weekly active users by 38%.</p><h4>SKILLS</h4><p id="previewSkills"></p></div></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
