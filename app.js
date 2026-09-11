@@ -1,6 +1,80 @@
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const toast = (message) => { const el = $('#toast'); el.textContent = message; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2400); };
+const SUPABASE_URL = window.SKYRESUME_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = window.SKYRESUME_SUPABASE_ANON_KEY || '';
+const supabaseClient = SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+let authMode = 'signup';
+let currentUser = null;
+const resumeStorageKey = 'skyresume:resume';
+
+function resumeSnapshot() {
+  return {
+    fullName: $('#fullName').value, jobTitle: $('#jobTitle').value, email: $('#email').value,
+    phone: $('#phone').value, location: $('#location').value, website: $('#website').value,
+    summary: $('#summary').value, skills: $$('.skill-chip').map(chip => chip.textContent.replace('×', '').trim()),
+    score: Number($('#scoreValue').textContent), updatedAt: new Date().toISOString()
+  };
+}
+function restoreResume(snapshot) {
+  if (!snapshot) return;
+  ['fullName', 'jobTitle', 'email', 'phone', 'location', 'website', 'summary'].forEach(id => { if (snapshot[id] !== undefined) $(`#${id}`).value = snapshot[id]; });
+  if (snapshot.summary) $('#summary').dispatchEvent(new Event('input'));
+  if (Array.isArray(snapshot.skills)) {
+    $('#skillChips').innerHTML = '';
+    snapshot.skills.forEach(skill => addSkillChip(skill));
+  }
+  if (snapshot.score) { $('#scoreValue').textContent = snapshot.score; updateScore(); }
+}
+async function saveResume() {
+  const data = resumeSnapshot();
+  localStorage.setItem(resumeStorageKey, JSON.stringify(data));
+  if (supabaseClient && currentUser) {
+    const { error } = await supabaseClient.from('resumes').upsert({ user_id: currentUser.id, title: `${data.jobTitle || 'Untitled'} Resume`, content: data }, { onConflict: 'user_id,title' });
+    if (error) throw error;
+  }
+}
+async function loadResumeForUser(user) {
+  const local = JSON.parse(localStorage.getItem(resumeStorageKey) || 'null');
+  if (!supabaseClient || !user) { restoreResume(local); return; }
+  const { data, error } = await supabaseClient.from('resumes').select('content').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  restoreResume(data?.content || local);
+}
+function setAuthState(user) {
+  currentUser = user;
+  $('#profileName').textContent = user?.email?.split('@')[0] || 'Jordan Davis';
+  $('#profilePlan').textContent = user ? 'Free plan · Cloud sync' : 'Free plan · Local mode';
+}
+function openAuth() { $('#authModal').classList.remove('hidden'); $('#authStatus').textContent = ''; }
+$('#authButton').addEventListener('click', openAuth);
+$('#closeAuth').addEventListener('click', () => $('#authModal').classList.add('hidden'));
+$('#authModal').addEventListener('click', event => { if (event.target.id === 'authModal') event.currentTarget.classList.add('hidden'); });
+$('#authToggle').addEventListener('click', () => {
+  authMode = authMode === 'signup' ? 'signin' : 'signup';
+  $('#authTitle').textContent = authMode === 'signup' ? 'Save your resume in the cloud' : 'Welcome back to SkyResume';
+  $('#authSubmit').textContent = authMode === 'signup' ? 'Create account' : 'Sign in';
+  $('#authToggle').textContent = authMode === 'signup' ? 'Already have an account? Sign in' : 'Need an account? Create one';
+});
+$('#continueGuest').addEventListener('click', () => { $('#authModal').classList.add('hidden'); toast('Local mode enabled — your resume is saved in this browser'); });
+$('#authForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const email = $('#authEmail').value.trim();
+  const password = $('#authPassword').value;
+  if (!supabaseClient) { $('#authStatus').textContent = 'Cloud sync is not configured yet. Your resume will continue saving locally.'; localStorage.setItem(resumeStorageKey, JSON.stringify(resumeSnapshot())); return; }
+  $('#authSubmit').disabled = true;
+  const result = authMode === 'signup'
+    ? await supabaseClient.auth.signUp({ email, password })
+    : await supabaseClient.auth.signInWithPassword({ email, password });
+  $('#authSubmit').disabled = false;
+  if (result.error) { $('#authStatus').textContent = result.error.message; return; }
+  setAuthState(result.data.user);
+  await loadResumeForUser(result.data.user);
+  $('#authModal').classList.add('hidden');
+  toast(authMode === 'signup' ? 'Account created — resume sync is ready' : 'Signed in — your resume is synced');
+});
 
 const templates = ['Minimal', 'Modern', 'Executive', 'Creative', 'Classic', 'Bold', 'Timeline', 'Portfolio', 'Elegant', 'Impact'];
 const accentColors = [
@@ -50,7 +124,7 @@ $('#summary').addEventListener('input', (event) => { $('#summaryCount').textCont
 $('#summaryAi').addEventListener('click', () => { $('#summary').value = 'Product designer with 6+ years of experience creating intuitive, accessible digital products used by millions. I combine user research, systems thinking, and rapid prototyping to turn complex problems into simple, delightful experiences. Known for partnering closely with engineering to ship measurable improvements.'; $('#summary').dispatchEvent(new Event('input')); updateScore(4); toast('AI improved your professional summary'); });
 $('#rescanBtn').addEventListener('click', () => { updateScore(); toast('ATS scan refreshed — your resume is looking strong'); });
 $('#scanBtn').addEventListener('click', () => { updateScore(3); toast('Scan complete — 3 keyword opportunities found'); });
-$('#saveBtn').addEventListener('click', () => toast('All changes saved just now'));
+$('#saveBtn').addEventListener('click', async () => { try { await saveResume(); toast(currentUser ? 'Changes saved to your cloud account' : 'Changes saved in this browser'); } catch (error) { console.error(error); toast('Could not sync right now; local copy saved'); } });
 $('#upgradeCta').addEventListener('click', () => toast('Pro plan preview: unlimited scans, tailoring, and premium designs'));
 $('.upgrade-btn').addEventListener('click', () => toast('Pro plan preview: unlimited scans, tailoring, and premium designs'));
 $('#addExperience').addEventListener('click', () => { const card = document.createElement('article'); card.className = 'experience-card collapsed'; card.innerHTML = '<div class="card-top"><div><strong>New position</strong><span>Company name · Location</span></div><button class="more-btn">•••</button></div><div class="experience-meta">Add dates</div><div class="card-actions"><button class="edit-experience">✎ Edit</button><button class="delete-experience">♲ Remove</button></div>'; $('#experienceList').append(card); bindExperienceActions(card); toast('New experience added'); });
@@ -105,3 +179,8 @@ $('#previewBtn').addEventListener('click', () => { syncPreview(); $('#previewMod
 $('#downloadBtn').addEventListener('click', () => { syncPreview(); const printWindow = window.open('', '_blank'); if (!printWindow) { toast('Allow pop-ups to download your resume'); return; } printWindow.document.write(`<html><head><title>${$('#fullName').value} Resume</title><style>body{font:14px Arial;color:#222;max-width:760px;margin:50px auto;line-height:1.5}h1{margin-bottom:4px}h4{color:#6857e8;letter-spacing:1px;border-bottom:1px solid #ddd;padding-bottom:6px;margin-top:26px}</style></head><body><h1>${$('#previewName').textContent}</h1><strong>${$('#previewTitle').textContent}</strong><p>${$('#previewContact').textContent}</p><h4>SUMMARY</h4><p>${$('#previewSummary').textContent}</p><h4>EXPERIENCE</h4><p><strong>Senior Product Designer · Northstar Labs</strong><br>Led end-to-end design for the core analytics platform, increasing weekly active users by 38%.</p><h4>SKILLS</h4><p>${$('#previewSkills').textContent}</p></body></html>`); printWindow.document.close(); printWindow.print(); });
 renderColorSwatches();
 renderTemplates();
+restoreResume(JSON.parse(localStorage.getItem(resumeStorageKey) || 'null'));
+if (supabaseClient) {
+  supabaseClient.auth.getSession().then(({ data }) => setAuthState(data.session?.user || null)).catch(error => console.error('Supabase session restore failed', error));
+  supabaseClient.auth.onAuthStateChange((_event, session) => setAuthState(session?.user || null));
+}
